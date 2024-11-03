@@ -5,12 +5,21 @@ import { getRandomChar, RandActions } from './store/RandAnimeSlice';
 import ClipLoader from 'react-spinners/ClipLoader'; 
 import { Favchar } from './components/FavChars';
 import CharInfo from './components/charInfo';
+import { useEffect } from 'react';
+import { postToServer } from './store/RandAnimeSlice';
+import { getFromServer } from './store/RandAnimeSlice';
 
 function App() {
+
+
+
+
+
   const char = useSelector((state) => state.rand.currentchar);
   const charIndexQuantity = useSelector((state) => state.rand.totalQuantity);
   const loading = useSelector((state) => state.rand.loading);
   const isShowing = useSelector((state)=> state.rand.isShowing);
+  const chars = useSelector((state) => state.rand.chars);
 
   const dispatch = useDispatch();
 
@@ -25,7 +34,18 @@ function App() {
   const setShowing = () => {
     dispatch(RandActions.setShowing());
   }
+ 
+  useEffect(() => {
+    dispatch(getFromServer());
+  }, [dispatch]);
 
+  // chars와 totalQuantity가 변경될 때만 Firebase에 데이터 저장
+  useEffect(() => {
+    if (chars.length > 0 || charIndexQuantity > 0) {
+      dispatch(postToServer(chars, charIndexQuantity));
+    }
+  }, [chars, charIndexQuantity, dispatch]);
+  
   
 
   
