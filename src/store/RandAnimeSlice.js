@@ -11,6 +11,8 @@ const RandSlice = createSlice({
      currentchar:{},
      chars:[],
      totalQuantity:0,
+     loading: false, 
+     isShowing:false,
     },
 
     reducers:{
@@ -38,6 +40,13 @@ const RandSlice = createSlice({
                 state.totalQuantity++;
             }
         },
+        setLoading(state, action) {
+            state.loading = action.payload; 
+          },
+        
+        setShowing(state) {
+          state.isShowing = !state.isShowing
+        }
     }
 
 })
@@ -46,23 +55,21 @@ const RandSlice = createSlice({
 
 //thunk 연습
 export const getRandomChar = () => {
-    return async dispatch => {
-        
-            try {
-                     const response = await axios.get('https://api.jikan.moe/v4/random/characters');
-                      dispatch(RandActions.getChar({
-                        currentchar: response.data.data || {},
-                      }))
-                      
-                   
-                 } catch (error) {
-                       console.error('실패', error);
-                     }
+    return async (dispatch) => {
+      dispatch(RandActions.setLoading(true)); 
+  
+      try {
+        const response = await axios.get('https://api.jikan.moe/v4/random/characters');
+        dispatch(RandActions.getChar({ currentchar: response.data.data || {} }));
+        console.log(response.data.data)
 
-        }
-
-
-    }
+      } catch (error) {
+        console.error('실패', error);
+      } finally {
+        dispatch(RandActions.setLoading(false)); 
+      }
+    };
+  };
 
 
 

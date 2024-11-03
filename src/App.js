@@ -1,85 +1,70 @@
 import logo from './logo.svg';
 import './App.css';
-import { useState,useEffect } from 'react';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getRandomChar, RandActions } from './store/RandAnimeSlice';
-
-
-
-
+import ClipLoader from 'react-spinners/ClipLoader'; 
+import { Favchar } from './components/FavChars';
+import CharInfo from './components/charInfo';
 
 function App() {
-
-  const char = useSelector((state)=> state.rand.currentchar);
-  const charIndex = useSelector((state)=> state.rand.chars)
-  const charIndexQuantitiy = useSelector((state)=> state.rand.totalQuantity);
-
+  const char = useSelector((state) => state.rand.currentchar);
+  const charIndexQuantity = useSelector((state) => state.rand.totalQuantity);
+  const loading = useSelector((state) => state.rand.loading);
+  const isShowing = useSelector((state)=> state.rand.isShowing);
 
   const dispatch = useDispatch();
 
-
-
   const getAnimeChar = () => {
-
     dispatch(getRandomChar());
-  }
+  };
 
   const saveAnimeChar = () => {
     dispatch(RandActions.addChar(char));
   };
 
-  const deleteAnimeChar = (charname) => {
-    dispatch(RandActions.removeChar(charname)); 
-  };
+  const setShowing = () => {
+    dispatch(RandActions.setShowing());
+  }
 
- 
+  
 
+  
 
   return (
-    <div className="App">
-      <button onClick={getAnimeChar}>눌러</button>
-      <button onClick={saveAnimeChar}>현재 캐릭터 저장하기</button> 
-      <h2>저장된캐릭터수:{charIndexQuantitiy}</h2>
-
-      {char && char.name ? (  
-        <div>
-          <h2>이름: {char.name} ({char.name_kanji})</h2>
-          <p>설명: {char.about}</p>
-          <p>좋아하는 수: {char.favorites}</p>
-          <img src={char.images.jpg.image_url} alt={char.name} width="200" />
-          <p>
-            <a href={char.url} target="_blank" rel="noopener noreferrer">
-              캐릭터 프로필
-            </a>
-          </p>
+    <div className="App min-h-screen bg-gray-100 py-8">
+      <div className="container mx-auto px-4">
+        <div className="flex space-x-4 justify-center mb-6">
+          <button
+            onClick={getAnimeChar}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow-md"
+          >
+            캐릭터 불러오기
+          </button>
+          <button
+            onClick={saveAnimeChar}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-md"
+          >
+            현재 캐릭터 저장하기
+          </button>
+          <button
+            onClick={setShowing}
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded shadow-md"
+          >
+            현재 저장된 캐릭터 표시/비표시
+          </button>
         </div>
-      ) : (
-        <p>버튼을 눌러주세요</p> 
-      )}
 
+      
+        <h2 className="text-center text-2xl font-semibold text-gray-700 mb-8">
+          저장된 캐릭터 수: {charIndexQuantity}
+        </h2>
 
        
-          <div>
-        {charIndex && charIndex.length > 0 ? ( 
-          charIndex.map((character, index) => (
-            <div key={index}>
-              <h2>{character.name}</h2>
-              <img src={character.images.jpg.image_url} alt={character.name} width="200" />
-              <button onClick={() => deleteAnimeChar(character.name)}>삭제</button> 
-            </div>
-          ))
-        ) : (
-          <p>저장된 캐릭터가 없습니다.</p>
-        )}
+        <CharInfo loading={loading} char={char} />
+
+        <Favchar isShowing={isShowing}/>
       </div>
-
     </div>
-  
- 
-
-
-
-
   );
 }
 
